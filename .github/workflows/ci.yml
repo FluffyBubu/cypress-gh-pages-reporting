@@ -34,16 +34,15 @@ jobs:
           
           
       - name: Download cypress-videos artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/download-artifact@v3
         with:
             name: cypress-videos
-            path: cypress/videos/
         
       - name: Copy videos to gh-pages 🎬
         uses: andstor/copycat-action@v3
         with:
             personal_token: ${{ secrets.PERSONAL_TOKEN }}
-            src_path: cypress/videos/
+            src_path: cypress-gh-pages-reporting/cypress/videos/
             dst_path: cypress-videos/
             dst_owner: FluffyBubu
             dst_repo_name: cypress-gh-pages-reporting
