@@ -18,7 +18,7 @@ jobs:
       - run: yarn report:mocha
 
       - name: Reports deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
           folder: mochawesome-report
