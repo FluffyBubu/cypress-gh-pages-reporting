@@ -42,8 +42,8 @@ jobs:
         uses: andstor/copycat-action@v3
         with:
             personal_token: ${{ secrets.PERSONAL_TOKEN }}
-            src_path: /home/runner/work/cypress-gh-pages-reporting/cypress-gh-pages-reporting
-            dst_path: cypress-videos/
+            src_path: /.
+            dst_path: /.
             dst_owner: FluffyBubu
             dst_repo_name: cypress-gh-pages-reporting
             dst_branch: gh-pages
