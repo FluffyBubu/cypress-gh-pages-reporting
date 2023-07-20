@@ -32,7 +32,13 @@ jobs:
           folder: mochawesome-report
           ssh-key: ${{ secrets.DEPLOY_KEY }}
           
-      - name: Copy videos to gh-pages 
+          
+      - name: Download cypress-videos artifact
+        uses: actions/download-artifact@v3
+        with:
+            name: cypress-videos
+        
+      - name: Copy videos to gh-pages 🎬
         uses: andstor/copycat-action@v3
         with:
             personal_token: ${{ secrets.PERSONAL_TOKEN }}
