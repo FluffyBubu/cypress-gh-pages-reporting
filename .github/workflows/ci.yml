@@ -31,14 +31,3 @@ jobs:
           branch: gh-pages
           folder: mochawesome-report
           ssh-key: ${{ secrets.DEPLOY_KEY }}
-        
-      - name: Copy videos to gh-pages 🎬
-        uses: andstor/copycat-action@v3
-        with:
-            personal_token: ${{ secrets.PERSONAL_TOKEN }}
-            src_path: suites/.
-            dst_path: /.
-            dst_owner: FluffyBubu
-            dst_repo_name: cypress-gh-pages-reporting
-            dst_branch: gh-pages
-            clean: true
