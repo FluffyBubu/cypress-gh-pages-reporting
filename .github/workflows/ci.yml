@@ -13,14 +13,11 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Cypress run 🧪
-        uses: cypress-io/github-action@v5
-        with:
-          browser: chrome
-          command: yarn cy:run
+        uses: cypress-io/github-action@v2
       - run: yarn report:merge
       - run: yarn report:mocha
 
-      - name: Deploy report to GitHub pages 🚀
+      - name: Reports deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.3.3
         with:
           branch: gh-pages
