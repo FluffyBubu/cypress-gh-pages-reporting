@@ -22,4 +22,4 @@ jobs:
         with:
           branch: gh-pages
           folder: mochawesome-report
-          ssh-key: true
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
