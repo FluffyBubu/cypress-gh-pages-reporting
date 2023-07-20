@@ -26,7 +26,7 @@ jobs:
         with:
             personal_token: ${{ secrets.PERSONAL_TOKEN }}
             src_path: cypress/videos/*
-            dst_path: cypress/videos/*
+            dst_path: /.
             dst_owner: FluffyBubu
             dst_repo_name: cypress-gh-pages-reporting
             dst_branch: gh-pages
