@@ -1,0 +1,22 @@
+{
+  "name": "cypress-gh-pages-reporting",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:FluffyBubu/cypress-gh-pages-reporting.git",
+  "author": "Marcus Harvey",
+  "license": "MIT",
+  "scripts": {
+    "cy:run": "yarn cypress run",
+    "report:merge": "mochawesome-merge > index.json",
+    "report:mocha": "marge index.json",
+    "report:clean": "rimraf mochawesome-report index.json"
+  },
+  "devDependencies": {
+    "cypress": "^12.17.1",
+    "cypress-multi-reporters": "^1.6.3",
+    "mochawesome": "^7.1.3",
+    "mochawesome-merge": "^4.3.0",
+    "mochawesome-report-generator": "^6.2.0",
+    "rimraf": "^5.0.1"
+  }
+}
