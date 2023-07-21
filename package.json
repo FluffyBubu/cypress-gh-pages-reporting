@@ -8,7 +8,7 @@
   "scripts": {
     "cy:run": "yarn cypress run",
     "report:merge": "mochawesome-merge mochawesome-report/results/*.json -o mochawesome-report/results/merged.json",
-    "report:mocha": "marge mochawesome-report/results/index.json --charts true --showHooks always --reportDir mochawesome-report/results --reportFilename index.html",
+    "report:mocha": "marge mochawesome-report/results/merged.json --charts true --showHooks always --reportDir mochawesome-report/results --reportFilename index.html",
     "report:clean": "rimraf mochawesome-report index.json"
   },
   "devDependencies": {
