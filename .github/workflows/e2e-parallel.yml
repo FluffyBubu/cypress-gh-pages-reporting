@@ -1,5 +1,5 @@
 name: End-to-end tests
-on: push
+on: []
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -89,13 +89,7 @@ jobs:
           path: split-results
       - name: Display structure of downloaded files
         run: ls -R split-results
-
-      # copy all reports and videos and screenshots into a single place
-      # mochawesome/
-      #   screenshots/
-      #   videos/
-      #   results/
-      #      all individual JSON reports
+  
       - name: Prepare folder
         run: |
           mkdir mochawesome

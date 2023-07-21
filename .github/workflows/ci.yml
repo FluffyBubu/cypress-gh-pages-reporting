@@ -1,6 +1,6 @@
 name: Cypress Tests
 
-on: []
+on: [push]
 
 jobs:
   cypress-run:
@@ -13,21 +13,70 @@ jobs:
         uses: cypress-io/github-action@v5
       - uses: actions/upload-artifact@v3
         with:
-            name: cypress-screenshots
-            path: cypress/screenshots
-            if-no-files-found: ignore
-      - uses: actions/upload-artifact@v3
-        with:
-            name: cypress-videos
-            path: cypress/videos
-            if-no-files-found: ignore
-      - run: yarn report:merge
-      - run: yarn report:mocha
+          name: cypress-split-results
+          path: |
+            cypress/screenshots
+            cypress/videos
+            cypress/results
+          if-no-files-found: ignore
 
+      merge-reports:
+        needs: test-split
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout 🛎
+            uses: actions/checkout@v3
+          - name: Install dependencies 🧪
+            uses: cypress-io/github-action@v5
+            with:
+              runTests: false
+          # https://github.com/actions/download-artifact
+          - uses: actions/download-artifact@v3
+            # download all test results artifacts from the previous jobs
+            # it would be nice to download only the split jobs test artifacts
+            # but cannot specify the pattern of the test artifacts yet
+            # https://github.com/actions/download-artifact/issues/103
+            with:
+              path: split-results
+          - name: Display structure of downloaded files
+            run: ls -R split-results
+      
+          - name: Prepare folder
+            run: |
+              mkdir mochawesome
+              mkdir -p mochawesome-report/screenshots
+              mkdir -p mochawesome-report/videos
+              mkdir -p mochawesome-report/results
+          - name: Copy all assets and JSON reports
+            run: |
+              cp -r split-results/cypress-split-results-*/screenshots/* mochawesome-report/screenshots || true
+              cp -r split-results/cypress-split-results-*/videos/* mochawesome-report/videos || true
+              cp -r split-results/cypress-split-results-*/results/* mochawesome-report/results || true
+          - name: Show copied files
+            run: ls -lR mochawesome
+    
+          - name: Merge Mochawesome JSON reports
+            run: npx mochawesome-merge mochawesome/results/*.json -o mochawesome/results/merged.json
+          - name: Generate Mochawesome HTML report
 
-      # - name: Reports deploy 🚀
-      #   uses: JamesIves/github-pages-deploy-action@v4
-      #   with:
-      #     branch: gh-pages
-      #     folder: mochawesome-report
-      #     ssh-key: ${{ secrets.DEPLOY_KEY }}
+          - run: yarn report:merge
+          - run: yarn report:mocha
+              
+              # npx marge mochawesome/results/merged.json \
+              #   --charts true --showHooks always \
+              #   --reportDir mochawesome/results \
+              #   --reportFilename index.html
+
+          - uses: JamesIves/github-pages-deploy-action@v4
+            with:
+              branch: gh-pages
+              folder: mochawesome-report
+              ssh-key: ${{ secrets.DEPLOY_KEY }}
+              clean: true
+    
+          - uses: actions/upload-artifact@v3
+            with:
+              name: merged-mochawesome-report
+              path: mochawesome
+          
+ 
