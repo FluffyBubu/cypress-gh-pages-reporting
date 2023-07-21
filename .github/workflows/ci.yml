@@ -21,6 +21,7 @@ jobs:
 
   merge-reports:
     needs: cypress-run
+    if: always()
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
