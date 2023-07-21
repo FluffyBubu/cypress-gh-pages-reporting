@@ -5,6 +5,8 @@ on: [push]
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -35,10 +37,6 @@ jobs:
           runTests: false
       # https://github.com/actions/download-artifact
       - uses: actions/download-artifact@v3
-        # download all test results artifacts from the previous jobs
-        # it would be nice to download only the split jobs test artifacts
-        # but cannot specify the pattern of the test artifacts yet
-        # https://github.com/actions/download-artifact/issues/103
         with:
           path: split-results
       - name: Display structure of downloaded files
@@ -62,11 +60,6 @@ jobs:
         run: yarn report:merge
       - name: Generate Mochawesome HTML report
         run: yarn report:mocha
-
-          # npx marge mochawesome/results/merged.json \
-          #   --charts true --showHooks always \
-          #   --reportDir mochawesome/results \
-          #   --reportFilename index.html
 
       - uses: JamesIves/github-pages-deploy-action@v4
         with:
