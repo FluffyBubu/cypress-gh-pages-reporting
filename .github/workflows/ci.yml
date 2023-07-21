@@ -56,12 +56,11 @@ jobs:
         run: ls -lR mochawesome
 
       - name: Merge Mochawesome JSON reports
-        run: npx mochawesome-merge mochawesome/results/*.json -o mochawesome/results/merged.json
+        run: npx mochawesome-merge mochawesome-report/results/*.json -o mochawesome-report/results/merged.json
       - name: Generate Mochawesome HTML report
-
-      - run: yarn report:merge
-      - run:
-          yarn report:mocha
+        run: |
+           yarn report:merge
+           yarn report:mocha
 
           # npx marge mochawesome/results/merged.json \
           #   --charts true --showHooks always \
@@ -78,4 +77,4 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: merged-mochawesome-report
-          path: mochawesome
+          path: mochawesome-report
