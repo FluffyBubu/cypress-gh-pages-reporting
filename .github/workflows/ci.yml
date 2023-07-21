@@ -47,8 +47,8 @@ jobs:
           mkdir -p mochawesome-report/results
       - name: Copy all assets and JSON reports
         run: |
-          cp -r split-results/cypress-split-results-*/videos/* mochawesome-report/videos || true
-          cp -r split-results/cypress-split-results-*/results/* mochawesome-report/results || true
+          cp -r split-results/cypress-split-results/videos/* mochawesome-report/videos || true
+          cp -r split-results/cypress-split-results/results/* mochawesome-report/results || true
       - name: Show copied files
         run: ls -lR mochawesome-report
 
