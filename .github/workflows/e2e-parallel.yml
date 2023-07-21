@@ -58,12 +58,12 @@ jobs:
       # - run: yarn report:merge
       # - run: yarn report:mocha
 
-      - name: Reports deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          branch: gh-pages
-          folder: mochawesome-report
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
+      # - name: Reports deploy 🚀
+      #   uses: JamesIves/github-pages-deploy-action@v4
+      #   with:
+      #     branch: gh-pages
+      #     folder: mochawesome-report
+      #     ssh-key: ${{ secrets.DEPLOY_KEY }}
 
   merge-reports:
     needs: test-split
