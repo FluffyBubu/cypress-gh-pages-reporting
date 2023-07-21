@@ -1,11 +1,8 @@
 name: End-to-end tests
 on: push
 jobs:
-  # example splitting all tests across GitHub machines
   prepare:
     runs-on: ubuntu-latest
-    # explicitly set the output of this job
-    # so that other jobs can use it
     outputs:
       matrix: ${{ steps.prepare.outputs.matrix }}
     steps:
@@ -19,6 +16,15 @@ jobs:
 
       - name: Print result 🖨
         run: echo '${{ steps.prepare.outputs.matrix }}'
+
+      # by installing dependencies once
+      # we cache them
+      - name: Checkout 🛎
+        uses: actions/checkout@v3
+      - name: Install deps 📦
+        uses: cypress-io/github-action@v5
+        with:
+          runTests: false
 
   test-split:
     needs: prepare
@@ -37,15 +43,14 @@ jobs:
         run: echo '${{ toJSON(strategy) }}'
 
       - name: Run split Cypress tests 🧪
-        # https://github.com/cypress-io/github-action
         uses: cypress-io/github-action@v5
-        with:
-          browser: chrome
         env:
           SPLIT: ${{ strategy.job-total }}
           SPLIT_INDEX: ${{ strategy.job-index }}
           DEBUG: cypress-split
-      # https://github.com/actions/upload-artifact
+        with:
+          browser: chrome
+
       - uses: actions/upload-artifact@v3
         with:
           name: cypress-split-results-e2e-${{ strategy.job-index }}
@@ -53,7 +58,6 @@ jobs:
             cypress/screenshots
             cypress/videos
             cypress/results
-            coverage
           if-no-files-found: ignore
       # - run: yarn report:merge
       # - run: yarn report:mocha
@@ -124,7 +128,7 @@ jobs:
 
   deploy-reports:
     needs: merge-reports
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: JamesIves/github-pages-deploy-action@v4
         with:
