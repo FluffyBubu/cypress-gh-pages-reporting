@@ -21,7 +21,6 @@ jobs:
           if-no-files-found: ignore
 
   merge-reports:
-    needs: cypress-run
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎
