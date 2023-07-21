@@ -56,11 +56,9 @@ jobs:
         run: ls -lR mochawesome-report
 
       - name: Merge Mochawesome JSON reports
-        run: npx mochawesome-merge mochawesome-report/results/*.json -o mochawesome-report/results/merged.json
+        run: yarn report:merge
       - name: Generate Mochawesome HTML report
-        run: |
-           yarn report:merge
-           yarn report:mocha
+        run: yarn report:mocha
 
           # npx marge mochawesome/results/merged.json \
           #   --charts true --showHooks always \
