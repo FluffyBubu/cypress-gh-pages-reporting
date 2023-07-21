@@ -3,7 +3,7 @@ on: push
 jobs:
   # example splitting all tests across GitHub machines
   prepare:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     # explicitly set the output of this job
     # so that other jobs can use it
     outputs:
@@ -22,7 +22,7 @@ jobs:
 
   test-split:
     needs: prepare
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
@@ -45,22 +45,90 @@ jobs:
           SPLIT: ${{ strategy.job-total }}
           SPLIT_INDEX: ${{ strategy.job-index }}
           DEBUG: cypress-split
+      # https://github.com/actions/upload-artifact
       - uses: actions/upload-artifact@v3
         with:
-              name: cypress-screenshots
-              path: cypress/screenshots
-              if-no-files-found: ignore
-      - uses: actions/upload-artifact@v3
-        with:
-              name: cypress-videos
-              path: cypress/videos
-              if-no-files-found: ignore
-      - run: yarn report:merge
-      - run: yarn report:mocha
+          name: cypress-split-results-e2e-${{ strategy.job-index }}
+          path: |
+            cypress/screenshots
+            cypress/videos
+            cypress/results
+            coverage
+          if-no-files-found: ignore
+      # - run: yarn report:merge
+      # - run: yarn report:mocha
 
       - name: Reports deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-            branch: gh-pages
-            folder: mochawesome-report
-            ssh-key: ${{ secrets.DEPLOY_KEY }}
+          branch: gh-pages
+          folder: mochawesome-report
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+
+  merge-reports:
+    needs: test-split
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@v3
+      - name: Install dependencies 🧪
+        uses: cypress-io/github-action@v5
+        with:
+          runTests: false
+      # https://github.com/actions/download-artifact
+      - uses: actions/download-artifact@v3
+        # download all test results artifacts from the previous jobs
+        # it would be nice to download only the split jobs test artifacts
+        # but cannot specify the pattern of the test artifacts yet
+        # https://github.com/actions/download-artifact/issues/103
+        with:
+          path: split-results
+      - name: Display structure of downloaded files
+        run: ls -R split-results
+
+      # copy all reports and videos and screenshots into a single place
+      # mochawesome/
+      #   screenshots/
+      #   videos/
+      #   results/
+      #      all individual JSON reports
+      - name: Prepare folder
+        run: |
+          mkdir mochawesome
+          mkdir -p mochawesome/screenshots
+          mkdir -p mochawesome/videos
+          mkdir -p mochawesome/results
+      - name: Copy all assets and JSON reports
+        run: |
+          cp -r split-results/cypress-split-results-*/screenshots/* mochawesome/screenshots || true
+          cp -r split-results/cypress-split-results-*/videos/* mochawesome/videos || true
+          cp -r split-results/cypress-split-results-*/results/* mochawesome/results || true
+      - name: Show copied files
+        run: ls -lR mochawesome
+
+      - name: Merge Mochawesome JSON reports
+        # assuming the merge tool is installed
+        run: npx mochawesome-merge mochawesome/results/*.json -o mochawesome/results/merged.json
+      - name: Generate Mochawesome HTML report
+        # assuming the merge tool is installed
+        run: |
+          npx marge mochawesome/results/merged.json \
+            --charts true --showHooks always \
+            --reportDir mochawesome/results \
+            --reportFilename index.html
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: merged-mochawesome-report
+          path: mochawesome
+
+  deploy-reports:
+    needs: merge-reports
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: mochawesome
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+          clean: true
